@@ -145,6 +145,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QPlainTextEdit" name="resultTextEdit">
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(177, 177, 177);</string>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="resultLabel">
      <property name="text">
       <string/>

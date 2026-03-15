@@ -13,3 +13,12 @@ class MainWindow(Ui_MainWindow, QMainWindow):
         self.setupUi(self)
         self.formWidget = FormWidget(self)
         self.verticalLayout_2.addWidget(self.formWidget)
+
+        self.actionSave.triggered.connect(self.save_to_txt)
+        self.actionOpen.triggered.connect(self.open_txt)
+
+    def save_to_txt(self):
+        self.formWidget.save_to_txt()
+
+    def open_txt(self):
+        self.formWidget.open_txt()
