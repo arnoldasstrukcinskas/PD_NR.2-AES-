@@ -17,6 +17,7 @@ class Encryptor(QObject):
         self.bits: int = None
         self.iv: bytes = None
         self.generated_key: str = None
+        self.data: dict = {}
 
     def cypher(self):
         bytes = int(self.bits / 8)
@@ -38,6 +39,14 @@ class Encryptor(QObject):
 
         cyphered_text = cipher.encrypt(padded_text)
         self.cyphered = cyphered_text
+
+        # Fill data dict for saving
+        self.data["key"] = key
+        self.data["iv"] = iv
+        self.data["mode"] = self.mode
+        self.data["bits"] = self.bits
+        self.data["cyphered_text"] = self.cyphered.hex()
+        self.write_to_txt()
         return cyphered_text
 
     def decypher(self):
@@ -60,7 +69,14 @@ class Encryptor(QObject):
         return unpad(decyphered_text, 16, style="pkcs7").decode("utf-8")
 
     def write_to_txt(self):
-        print("writing to txt")
+        save_dir = "data"
+        os.makedirs(save_dir, exist_ok=True)
+
+        file_path = os.path.join(save_dir, "saved.txt")
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            for key, value in self.data.items():
+                f.write(f"{key}: {value}\n")
 
     def read_from_txt(self):
         print("reading from txt")
