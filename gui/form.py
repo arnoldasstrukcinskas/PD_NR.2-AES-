@@ -21,7 +21,7 @@ class FormWidget(Ui_Form, QWidget):
         self.setupUi(self)
         self.encryptor = Encryptor()
 
-        self.cypherModeComboBox.currentIndexChanged.connect(self.set_mode)
+        self.cypherModeComboBox.currentTextChanged.connect(self.set_mode)
         self.bits128RadioButton.clicked.connect(self.set_bit_128_bits)
         self.bits192RadioButton.clicked.connect(self.set_bit_192_bits)
         self.bits256RadioButton.clicked.connect(self.set_bit_256_bits)
@@ -33,6 +33,9 @@ class FormWidget(Ui_Form, QWidget):
         self.decypherPushButton.clicked.connect(self.decypher)
 
     def cypher(self):
+        if self.cypherModeComboBox.currentIndex == 0:
+            QMessageBox.critical(self, "Mode Error", "Select mode")
+
         if self.encryptor.key == "" or self.encryptor.key is None:
             QMessageBox.critical(self, "Key Error", "Missing key")
 
@@ -40,22 +43,22 @@ class FormWidget(Ui_Form, QWidget):
             QMessageBox.critical(self, "Text Error", "Missing text")
 
         self.inputTextEdit.setPlainText(self.encryptor.text)
-        text = self.encryptor.cypher().hex()
-        self.resultTextEdit.setPlainText(text)
+        self.encryptor.cypher()
+        self.resultTextEdit.setPlainText(self.encryptor.cyphered.hex())
 
     def decypher(self):
         if self.encryptor.key == "" or self.encryptor.key is None:
             QMessageBox.critical(self, "Key Error", "Missing key")
 
-        if self.encryptor.text == "" or self.encryptor.text is None:
+        if self.encryptor.cyphered is None:
             QMessageBox.critical(self, "Text Error", "Missing text")
 
         text = self.encryptor.decypher()
 
-        self.inputTextEdit.setPlainText(self.encryptor.text)
+        self.inputTextEdit.setPlainText(self.encryptor.cyphered.hex())
         self.resultTextEdit.setPlainText(text)
 
-    def set_mode(self, mode: int):
+    def set_mode(self, mode: str):
         self.encryptor.mode = mode
 
     def set_bit_128_bits(self):
@@ -74,7 +77,21 @@ class FormWidget(Ui_Form, QWidget):
         self.encryptor.key = self.keyTextEdit.toPlainText()
 
     def save_to_txt(self):
-        print("Saved to txt")
+        self.encryptor.write_to_txt()
 
     def open_txt(self):
-        print("Opened txt")
+        self.encryptor.read_from_txt()
+        self.cypherModeComboBox.setCurrentText(self.encryptor.mode)
+        self.set_bits()
+        self.keyTextEdit.setPlainText(self.encryptor.key)
+        self.inputTextEdit.setPlainText(self.encryptor.cyphered.hex())
+
+        self.decypher()
+
+    def set_bits(self):
+        if self.encryptor.bits == 128:
+            self.bits128RadioButton.setChecked(True)
+        elif self.encryptor.bits == 192:
+            self.bits192RadioButton.setChecked(True)
+        elif self.encryptor.bits == 256:
+            self.bits256RadioButton.setChecked(True)
